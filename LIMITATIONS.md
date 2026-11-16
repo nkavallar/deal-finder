@@ -13,7 +13,7 @@ the intake self-check records which route actually works in each setup.
 Because Amazon is so often the price to beat, this is a major gap when no
 route works.
 
-Working routes:
+Working routes, none of which need an Amazon account:
 
 1. **Direct**, if the agent's browser genuinely loads the product page.
    A successful direct read is a live read like any other.
@@ -21,15 +21,26 @@ Working routes:
    drive one. A normal residential browser session usually loads Amazon
    fine, sometimes after a "continue shopping" or human-verification
    click.
-3. **Price trackers**: Keepa or CamelCamelCamel give price history and
-   current-price estimates. Useful for "is this a good price" and for
-   watch alerts. They do not prove current stock, and a tracker price is
-   not a live page read. Label it **tracker estimate**.
-4. **The user checks manually** and tells the agent the price
+3. **Search results**: Google web search and Google Shopping often
+   surface the current Amazon price for an exact product or ASIN. Label
+   it **search result**, date it, and cross-check it against a tracker:
+   snippet prices can be stale, or for a different variant or seller.
+4. **Public price trackers, no registration for basic lookups.**
+   CamelCamelCamel product pages are searchable by ASIN or Amazon URL
+   and show Amazon, third-party new, and third-party used prices with
+   history; the charts and current figures are viewable without an
+   account (accounts only manage alerts). Keepa is likewise usable
+   without registration for basic price history, though some advanced
+   data is paid. Tracker data can lag, and a tracker may show no current
+   Amazon price at all; neither proves current stock. Label it
+   **tracker estimate**. Deal Finder's own watches check these routes on
+   their schedule rather than relying on tracker accounts or alerts.
+5. **The user checks manually** and tells the agent the price
    (**user-reported**).
 
 Quote an Amazon price as verified only when it came from a live page or
-cart read (routes 1 and 2).
+cart read (routes 1 and 2). Routes 3 and 4 set the price to beat; they do
+not verify it.
 
 ## Other retailer bot walls
 
@@ -39,6 +50,13 @@ about the route, not about the product: it does not mean the item is
 unavailable or the sale ended. Fall back to the user's own browser or
 device when available, and say plainly which retailers could not be
 checked.
+
+Ordinary human-verification steps inside a flow the user authorized
+(CAPTCHAs, "I am human" checkboxes, continue-shopping interstitials) are
+not, by themselves, a limitation to report: agents work through the ones
+their environment can handle, as part of the task. A hard refusal of
+automated access, a credential prompt, or a one-time code is different;
+that is where the user steps in.
 
 ## Code sites and aggregators are unreliable
 
@@ -68,7 +86,10 @@ and the discount actually applies in the cart or program flow. A
 successful application does not override terms that clearly exclude the
 item; when the cart and the terms disagree, the agent flags the conflict
 instead of declaring a winner. Identity verification is always the user's
-own step.
+own step. That limit is about completing verification, not about finding
+the discount: when intake records the user's eligibility and a retailer
+advertises the program, the agent surfaces it in the results with the
+conditional price, and hands the verify-and-apply step to the user.
 
 ## Watches need a real scheduler
 

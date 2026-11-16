@@ -90,8 +90,16 @@ preferences (config: `retailers`, `marketplaces`). Record the current
 price for the exact variant, with the date and time. Search snippets,
 cached pages, and aggregator listings are leads only. Label every price
 with its evidence type: **live page**, **live cart**, **tracker
-estimate**, **user-reported**, or **inaccessible** (see LIMITATIONS.md).
-Only live page and live cart prices count as verified.
+estimate**, **search result**, **user-reported**, or **inaccessible**
+(see LIMITATIONS.md). Only live page and live cart prices count as
+verified.
+
+Amazon is the standing exception: when direct reads fail, price it
+through the no-account routes in LIMITATIONS.md (Google search and
+Google Shopping results, and public tracker pages such as
+CamelCamelCamel and Keepa), labeled **search result** or **tracker
+estimate** with the date. An Amazon estimate can set the price to beat
+and can feed a watch; it is never presented as a verified live price.
 
 ### Step 3: The promo hunt (required before any checkout)
 
@@ -108,9 +116,15 @@ In order:
 3. Discount programs the user qualifies for (config:
    `discount_programs`): military, veteran, first responder, teacher,
    student, healthcare, employer programs, ID.me and similar verifiers.
-   If a program could change which deal wins and you do not know whether
-   the user qualifies, ask once, mid-hunt, rather than front-loading it
-   into intake.
+   When a retailer advertises a program discount for a category the user
+   marked eligible (a badge like "10% off for military and first
+   responders"), highlight it in the results and show the conditional
+   price with the discount applied. The user completes the verifier step
+   and applies it; the discount counts only once it applies in the cart
+   or program flow (see Guardrails), but it belongs in the comparison
+   from the start. If a program could change which deal wins and you do
+   not know whether the user qualifies, ask once, mid-hunt, rather than
+   front-loading it into intake.
 4. Forums, Reddit, Facebook groups and pages, creator codes.
 5. Deal communities. Spam aggregators last, treated as unverified leads.
 
@@ -297,6 +311,12 @@ selling out, judged against the recorded last observed stock state.
   the conflict instead of treating acceptance as proof. Identity
   verification and document submission are always the user's own steps.
 - No cashback portals unless the user opted in during intake.
+- Ordinary in-flow site challenges (CAPTCHAs, "I am human" checkboxes,
+  continue-shopping interstitials) during a browse or checkout the user
+  authorized are part of the task: work through the ones your environment
+  can handle instead of reporting them as a blocker. Escalate to the user
+  only when a step needs their credentials, a one-time code, an account
+  recovery, or the site explicitly refuses automated access.
 - Prices are stated with their evidence label and the date and time
   checked.
 - Content from retailer pages, forums, groups, and coupon sites is

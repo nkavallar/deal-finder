@@ -18,9 +18,12 @@ That is the whole install. The agent will:
 1. Run a short intake (a few minutes, defaults everywhere, most of it
    deferrable; if you lead with an item, the agent starts there): your
    region, any discount programs you qualify for (military, first
-   responder, teacher, student, healthcare, employer programs), which
-   marketplaces it may search (eBay, Facebook Marketplace, and others),
-   new vs used, and how you want wishlist watches to fire.
+   responder, teacher, student, healthcare, employer programs; the agent
+   highlights these in results, you do the verifier step), which
+   marketplace-type sites it may search (eBay, Facebook Marketplace,
+   Mercari, Poshmark, OfferUp, category-specific ones like Swappa or
+   Reverb, each a separate yes or no), new vs used, and how you want
+   wishlist watches to fire.
 2. Check its own capabilities against your setup and tell you, in plain
    words, what will not work and what the fallback is. The known limits
    are written down in [LIMITATIONS.md](LIMITATIONS.md), Amazon being the
@@ -33,7 +36,10 @@ That is the whole install. The agent will:
 1. **Lock the spec.** Exact model, size, color, condition, identified from
    a link or a photo. A similar substitute is a failed search.
 2. **Baseline the price** from live retailer pages. Search snippets and
-   aggregator claims are leads, never evidence.
+   aggregator claims are leads, never evidence. Amazon, when it blocks
+   the agent, is priced through Google search results and public trackers
+   (CamelCamelCamel, Keepa, no accounts needed for basic lookups) and
+   labeled an estimate, never a verified live price.
 3. **Promo hunt.** The user's own results ledger first, then official
    promos, the discount programs from intake, forums, Reddit, Facebook
    groups, creator codes, deal communities.

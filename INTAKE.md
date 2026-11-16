@@ -23,8 +23,14 @@ a result.
 
 ## 2. Discount programs
 
-"Do you qualify for any of these? They change which deals are best, so the
-agent checks them first."
+"Do you qualify for any of these? Asked once, here, so every hunt can use
+the answer. Retailers advertise these discounts on product pages (things
+like '10% off for military and first responders'); when one matches a
+category you marked, the agent highlights it in the results and shows the
+price with the discount applied. You complete the verifier step and apply
+it at checkout; the agent never submits identity documents or completes
+verification for you, but not being able to verify for you does not take
+the discount out of the hunt."
 
 - Military or veteran
 - First responder (police, fire, EMT, dispatch)
@@ -34,14 +40,33 @@ agent checks them first."
 - Government employee
 - An employer's discount program or corporate perks portal
 - Warehouse clubs: Costco, Sam's Club, BJ's
-- Verified through ID.me, VerifyPass, UNiDAYs, or similar? (Which ones?)
+- Verified through ID.me, SheerID, GovX, VerifyPass, UNiDAYS, Student
+  Beans, or similar? (Which ones?)
 
-Default: none. The agent still checks public promos for everyone.
+Default: none recorded. The agent still checks public promos for
+everyone, and asks later only if a program could change which deal wins.
 
 ## 3. Marketplaces and condition
 
-- Search used marketplaces too? eBay, Facebook Marketplace, Craigslist,
-  Mercari, Poshmark. (Default: eBay on, the rest off until asked.)
+"Should the agent search marketplace-type sites as well as regular
+retailers? There are a lot of them, and they differ in access, buyer
+protection, and how much condition varies, so each one is its own
+yes or no."
+
+- General resale: eBay, Mercari, Poshmark, Etsy, OfferUp.
+- Local and person-to-person: Facebook Marketplace, Craigslist, Nextdoor.
+- Category-specific: Swappa (phones and electronics), Reverb (music
+  gear), StockX and GOAT (sneakers and streetwear), Chairish (home
+  goods), and equivalents for the user's hobbies.
+- Third-party sellers inside retailer marketplaces (Walmart Marketplace
+  and similar) count as marketplace results: seller, shipping, and return
+  terms get reported separately from the retailer's own offers.
+
+Defaults: eBay on; the rest off until asked, because access and
+protection vary the most there. For local marketplaces: is local pickup
+OK, and within what distance? (Default: no pickup, shipped listings
+only.)
+
 - New items only, or is used OK? For which categories is used acceptable,
   and which are always new-only? (Default: new only. Common pattern: used
   OK for tools, parts, and gear; new only for clothing, footwear, and
@@ -102,9 +127,10 @@ separately (being able to do one says nothing about the others):
 - Access each marketplace the user enabled? Natively, via the browser,
   or not at all?
 - Amazon: can you read Amazon product pages directly? Many agent
-  browsers cannot (see LIMITATIONS.md). Record the working route:
-  direct, price tracker (Keepa or CamelCamelCamel), the user's own
-  device browser, or manual check by the user.
+  browsers cannot (see LIMITATIONS.md). Record the working routes:
+  direct, search results (Google web search or Google Shopping), public
+  price trackers (CamelCamelCamel or Keepa, no account needed for basic
+  lookups), the user's own device browser, or manual check by the user.
 - Access the user's discount program accounts, or will the user apply
   those discounts themselves at checkout? (The agent never submits
   identity documents or verification on the user's behalf.)

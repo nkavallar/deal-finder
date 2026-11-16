@@ -23,10 +23,16 @@ discount_programs:
 
 marketplaces:
   ebay: true
-  facebook_marketplace: false
-  craigslist: false
   mercari: false
   poshmark: false
+  etsy: false
+  offerup: false
+  facebook_marketplace: false
+  craigslist: false
+  nextdoor: false
+  category_specific: []  # e.g. [swappa, reverb, stockx]
+  retailer_third_party_sellers: false
+  local_pickup: { enabled: false, radius_miles: null }
 
 condition:
   default: new           # new | used_ok
@@ -62,7 +68,7 @@ capabilities:
   retailer_browsing: unknown
   cart_and_code_testing: unknown
   scheduling: unknown    # scheduler name/task id, or "manual"
-  amazon_route: unknown  # direct | user_device_browser | price_tracker | manual
+  amazon_route: unknown  # direct | user_device_browser | price_tracker | search_result | manual
   marketplace_access: {}
   throwaway_inbox: unknown
   notifications: unknown
