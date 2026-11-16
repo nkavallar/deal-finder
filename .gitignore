@@ -1,0 +1,7 @@
+# Deal Finder runtime files hold personal data (postal code, discount
+# program affiliations, purchase history, watch interests).
+# They are created by the agent during intake and must never be
+# committed or published. Keep this file in place.
+deal-finder.config.yaml
+promo-code-ledger.md
+WATCHES.md
