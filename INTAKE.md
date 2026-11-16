@@ -11,7 +11,10 @@ per hunt, when they actually matter. Say so, show the default summary,
 and move on.
 
 Write the answers into `deal-finder.config.yaml`. Anything left blank
-keeps the default shown here.
+keeps the default shown here. Record which sections were answered and
+which were deferred in the config (`intake.deferred_sections`); deferred
+means unknown, and the agent asks later only if that section could change
+a result.
 
 ## 1. Basics
 

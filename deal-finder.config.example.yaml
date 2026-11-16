@@ -1,6 +1,10 @@
 # Deal Finder configuration. The agent creates deal-finder.config.yaml
 # from this file during intake (see INTAKE.md) and reads it on every run.
 
+intake:
+  completed: false
+  deferred_sections: []  # skipped for now; deferred means unknown, not "no"
+
 basics:
   country: US
   currency: USD

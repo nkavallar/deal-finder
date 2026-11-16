@@ -3,9 +3,9 @@
 A deal-hunting process for personal AI agents. It finds the best verified
 price on a specific item, tests promo codes in the actual cart instead of
 trusting coupon sites, and watches wishlist items until they hit a target
-price. Watches run on a real scheduled task the agent sets up and
-verifies during intake; if the agent cannot run unattended, it says so
-and checks when asked.
+price. Watches run on a real scheduled task the agent creates when you
+choose a watch and test-runs once on the spot; if the agent cannot run
+unattended, it says so and checks when asked.
 
 ## Use it
 
@@ -15,11 +15,12 @@ Give your agent this repo and tell it:
 
 That is the whole install. The agent will:
 
-1. Run a short intake (a few minutes, defaults everywhere): your region,
-   any discount programs you qualify for (military, first responder,
-   teacher, student, healthcare, employer programs), which marketplaces
-   it may search (eBay, Facebook Marketplace, and others), new vs used,
-   and how you want wishlist watches to fire.
+1. Run a short intake (a few minutes, defaults everywhere, most of it
+   deferrable; if you lead with an item, the agent starts there): your
+   region, any discount programs you qualify for (military, first
+   responder, teacher, student, healthcare, employer programs), which
+   marketplaces it may search (eBay, Facebook Marketplace, and others),
+   new vs used, and how you want wishlist watches to fire.
 2. Check its own capabilities against your setup and tell you, in plain
    words, what will not work and what the fallback is. The known limits
    are written down in [LIMITATIONS.md](LIMITATIONS.md), Amazon being the
@@ -65,8 +66,9 @@ quick hunt first, so the alert carries the current best total and the
 same buy, keep watching, or drop choice, not just a raw price. A preorder
 or backorder is not a release, a category-page label is not stock
 evidence, and marketplace listings get their claimed condition reported
-with photo mismatches flagged. The wishlist is your data: it is created
-locally by your agent and covered by the repo's .gitignore, never
+with photo mismatches flagged. The wishlist is your data: your agent
+creates it locally, preferably outside the shared repo folder, and the
+repo's .gitignore plus the playbook's setup rules keep it out of anything
 published.
 
 ## Files

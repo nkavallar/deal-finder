@@ -41,15 +41,23 @@ in preferences as they come up.
    Never promise a route you have not verified you have. Re-run the
    relevant check whenever a route fails or your tools change.
 3. Write the answers to `deal-finder.config.yaml` (start from
-   `deal-finder.config.example.yaml`). Create `promo-code-ledger.md` from
+   `deal-finder.config.example.yaml`). Record which intake sections were
+   answered and which were deferred (`intake.deferred_sections`); a
+   deferred section is unknown, not a "no", and gets asked later only if
+   it could change a result. Create `promo-code-ledger.md` from
    `templates/promo-code-ledger.md` and `WISHLIST.md` from
    `templates/WISHLIST.md` only if they do not already exist; never
    overwrite an existing ledger or wishlist. Delete the sample rows from
    fresh copies.
-4. The config, ledger, and wishlist hold personal data. They are covered
-   by this repo's `.gitignore`; keep them out of any commit or
-   publication. Never log credentials, payment details, gift-card
-   numbers, identity documents, or account session links anywhere.
+4. The config, ledger, and wishlist hold personal data. Where your
+   environment allows, keep the three runtime files in a private data
+   folder outside this repo's folder and note their location in the
+   config. If they live in the repo folder, this repo's `.gitignore` is
+   the guard: keep them out of any commit or publication, and before
+   sharing or exporting the folder, verify none of the three files, or
+   copies under other names, are included. Never log credentials, payment
+   details, gift-card numbers, identity documents, or account session
+   links anywhere.
 5. Read [LIMITATIONS.md](LIMITATIONS.md) and summarize the limits that
    apply to this user's setup, in plain words, once.
 6. Finish setup by asking for the first item: a link, a photo, or a name,
@@ -70,6 +78,11 @@ questions; otherwise proceed. Collect per-hunt constraints at the same
 time: deadline, delivery vs local pickup, and any premium the user will
 pay to buy from a preferred retailer.
 
+Find the item's wishlist entry, or create it now with status `hunting`,
+so the hunt's results have a home. If the entry is currently `watching`,
+the hunt takes over: pause its scheduled check while the hunt runs, and
+let the handoff (Step 7) decide the final state.
+
 ### Step 2: Baseline the price
 
 Check live product pages at retailers appropriate to the user's region and
@@ -81,6 +94,11 @@ estimate**, **user-reported**, or **inaccessible** (see LIMITATIONS.md).
 Only live page and live cart prices count as verified.
 
 ### Step 3: The promo hunt (required before any checkout)
+
+Work the sources in order, one pass. Go deeper (more forums, more code
+sources, more retailers) only when the item's price makes another few
+percent worth real money, or the user asks. A hunt that reaches the
+decision point beats an exhaustive one that does not.
 
 In order:
 
@@ -104,7 +122,11 @@ signup they did not approve.
 ### Step 4: Test in the cart
 
 Add the exact item to the cart and test candidate codes there (cap about
-12, stop if the site throttles). Record the cart total before and after
+12, stop if the site throttles). Start each code test from a clean cart
+state: remove any previously applied code before testing the next, and
+test combinations only after each code has been tested alone. Leave the
+cart as you found it; if it holds the user's unrelated items, do not
+remove them, and say so if that limits testing. Record the cart total before and after
 each code, for the same item, quantity, shipping method, and destination.
 A code counts only when it changes that total, including a shipping-only
 change from a free-shipping code; a discount line that was already there
@@ -147,6 +169,11 @@ seller, stock, and delivery estimate, plus return or warranty limits when
 they differ. Call it the lowest verified total among the sources checked,
 and name the sources that could not be checked.
 
+If no verified offer exists (out of stock everywhere, unreleased, or
+every source inaccessible), say so plainly, with the evidence labels. The
+handoff still applies, with watch as the natural exit: an availability
+watch for stock, or a price watch once a baseline exists.
+
 ### Step 7: The handoff (buy, watch, or pass)
 
 Every hunt ends here. Present the three exits plainly and let the user
@@ -158,12 +185,16 @@ pick; do not pick for them.
   the hunt never created one) and log the purchase (Step 8).
 - **Watch.** Offer a watch with its terms already filled in from this
   hunt, so the user confirms or changes one number instead of answering
-  questions: the exact variant from Step 1, the reference price from
-  Step 2 (amount, retailer, evidence label, date), a proposed target
-  (the config default, or a number the user names), the retailers and
-  marketplaces that actually stock it, the watch cadence and alert
-  destination from config. Create or update the wishlist entry with
-  status `watching` and set up the scheduled check (Watch mode, below).
+  questions: the exact variant from Step 1; the reference price, which is
+  the best verified total from this hunt, on a stated basis (product
+  price, whether shipping is included, currency, quantity); a proposed
+  target stated as a dollar figure, not only a percentage (the config
+  default, or a number the user names); the retailers and marketplaces
+  that actually stock it; the watch cadence and alert destination from
+  config. Create or update the wishlist entry with status `watching` and
+  set up the scheduled check (Watch mode, below). All later comparisons
+  use the same basis as the reference price; an offer whose required
+  costs are unknown does not count as hitting a price ceiling.
 - **Pass.** Log what the hunt learned (Step 8) and, if the item was on
   the wishlist, mark it `dropped`. A pass with no watch is a complete
   outcome, not a failure.
@@ -184,10 +215,15 @@ retest a code before relying on it again.
 From a hunt, use Step 7: everything carries over, nothing is re-derived.
 Directly ("just watch this"), lock the spec (Step 1) and take one light
 baseline (a single live price read for the reference price), then confirm
-the target, cadence, and alert destination the same way. Either way, the
-wishlist entry holds: variant, status `watching`, reference price with
-source and date, target, where to check, schedule reference, last
-checked, and last alert.
+the target, cadence, and alert destination the same way. If no live price
+exists (unreleased, or sold out everywhere), an availability watch needs
+no baseline; price-derived targets (`percent_off`, `any_sale`) stay off
+until a verified baseline exists, or the user sets a `price_ceiling`
+instead. Keep official and sold-out product pages in "where to check";
+they are the pages a restock watch lives on. Either way, the wishlist
+entry holds: variant, status `watching`, reference price with source,
+basis, and date, target, where to check, schedule reference, last
+checked, last observed price and stock state, and last alert.
 
 Target types:
 
@@ -204,17 +240,25 @@ Target types:
 A cadence in the config does not schedule anything by itself. Set up a
 real scheduled task in whatever scheduler your environment provides,
 verify it is enabled, and record its identifier, timezone, and delivery
-destination in the wishlist entry. If your environment cannot run
-unattended, the watch is manual: checks happen when the user invokes
-them, and the user is told that plainly at creation.
+destination in the wishlist entry. Then run it once, immediately, as a
+test through the same path: confirm the run can read the wishlist, check
+a source, write its state back, and reach the alert destination. If the
+test fails, the watch is manual and the user is told. If your environment
+cannot run unattended, the watch is manual from the start: checks happen
+when the user invokes them, and the user is told that plainly at
+creation.
 
 Each check reads live prices for the exact variant at the entry's
-sources, updates `last checked`, and stays silent unless the target is
-hit. Rules that matter:
+sources, updates `last checked` and the last observed price and stock
+state, and stays silent unless the target is hit. A run skips entries in
+terminal states (`bought`, `dropped`) and removes their scheduled tasks
+if any remain. "New low" means lower than the lowest price previously
+alerted for this entry. Rules that matter:
 
 - A preorder, backorder, or presale listing is not availability. For
-  unreleased products, fire only on a verified in-stock product page or
-  an official availability announcement.
+  unreleased products, fire only on a verified in-stock product page. An
+  official announcement without purchasable stock is recorded in the
+  entry's notes, not alerted.
 - Category-page labels ("new arrival", "limited stock") are not stock
   evidence. The product page is.
 - On marketplace listings, report the condition the listing claims and
@@ -226,14 +270,23 @@ hit. Rules that matter:
 ### When a watch fires
 
 Do not alert on the raw tripping price alone. Run a quick version of the
-hunt (Steps 2 to 5, lighter promo pass) so the alert carries the current
-best verified total, then present the same three exits as Step 7: buy,
-keep watching (with a new reference price if the user wants the bar
-moved), or drop. Record the alert in the entry (date, price, retailer)
-and set the status to `alerted`; do not alert again for the same price,
-only on a new lower price or a return to stock after selling out. If the
-user buys, the entry goes to `bought` and the scheduled check for it is
-removed; if they drop it, `dropped` and the check is removed.
+hunt first, within unattended limits: live price reads and public promo
+checks only. Cart testing, retailer contact, and anything needing the
+user's accounts wait for the user's response; label anything not verified
+that way as untested. After the quick hunt, re-check the target against
+the best currently purchasable offer on the entry's price basis. If it no
+longer qualifies (shipping pushed it over the ceiling, stock is gone, a
+discount turns out ineligible), record the observation, keep the status
+`watching`, and do not alert.
+
+If it qualifies, record the alert in the entry (date, price, retailer),
+set the status to `alerted`, and present the same three exits as Step 7:
+buy, keep watching, or drop. Buy or drop is terminal from every path,
+hunt or watch: the entry goes to `bought` or `dropped` and the scheduled
+check is cancelled. Keep watching returns the status to `watching` (with
+a new reference price if the user wants the bar moved). Do not alert
+again for the same price, only on a new low or a return to stock after
+selling out, judged against the recorded last observed stock state.
 
 ## Guardrails
 

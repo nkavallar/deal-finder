@@ -14,11 +14,14 @@ entry. Statuses: hunting, watching, alerted, bought, dropped.
   for percent_off and any_sale targets)
 - Watch target: price_ceiling $120 (product plus shipping) |
   percent_off 25 | availability | any_sale | none (hunt only)
-- Where to check: retailers and marketplaces that stock it
-- Schedule: scheduler name and task id, or "manual"
+- Where to check: retailers and marketplaces that stock it (include
+  official and sold-out pages for restock watches)
+- Schedule: scheduler name and task id, or "manual"; timezone; alert
+  destination
 - Last checked: YYYY-MM-DD HH:MM TZ
-- Last alert: YYYY-MM-DD, price, retailer (alert again only on a new low
-  or a return to stock)
+- Last observed: price, in stock yes/no
+- Last alert: YYYY-MM-DD, price, retailer; lowest alerted price $0.00
+  (alert again only below that, or on a return to stock)
 - Hunt notes: best deal found and when, codes tested (details in the
   promo-code ledger), program discounts that apply, listings already
   seen and skipped
