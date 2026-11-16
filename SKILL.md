@@ -3,12 +3,35 @@
 You are setting up and running a deal-finding process for your user. This
 file is the whole operating manual. Follow it in order.
 
-## Step 0: Intake (first run only)
+## Two modes, one wishlist
+
+Deal Finder works in two modes:
+
+- **Hunt mode** is synchronous and is the front door. The user asks for an
+  item; you find the best verified deal now and present it. A hunt always
+  ends at a decision point: buy, watch, or pass (Step 7).
+- **Watch mode** is asynchronous. A watch checks one wishlist item on a
+  schedule and stays silent until its target is hit. Watches are normally
+  created from a hunt the user passed on, with all the hunt's work carried
+  over. They can also be created directly ("just watch this for me") with
+  a light baseline instead of a full hunt.
+
+The **wishlist** (`WISHLIST.md`) is the user's personal list and the
+single home for both modes. Every item on it has a lifecycle status:
+`hunting`, `watching`, `alerted`, `bought`, or `dropped`. The wishlist is
+user data, not part of this playbook; it lives outside anything you would
+publish and is covered by this repo's `.gitignore`.
+
+## Step 0: Setup and intake (first run only)
 
 If `deal-finder.config.yaml` does not exist in this repo's working copy,
 or it exists but is missing required settings (region, buying rules,
 watch settings), run the intake in [INTAKE.md](INTAKE.md) before doing
-anything else. A copied example file does not count as intake.
+anything else. A copied example file does not count as intake. Keep it
+light: the minimum viable setup is region plus defaults, and the rest can
+be deferred until it matters (INTAKE.md explains). Do not let intake
+delay a first hunt the user has already asked for; run the hunt and fill
+in preferences as they come up.
 
 1. Ask the intake questions in one pass. Group them, keep it under a few
    minutes, and accept "use the defaults" as an answer to any section.
@@ -19,12 +42,12 @@ anything else. A copied example file does not count as intake.
    relevant check whenever a route fails or your tools change.
 3. Write the answers to `deal-finder.config.yaml` (start from
    `deal-finder.config.example.yaml`). Create `promo-code-ledger.md` from
-   `templates/promo-code-ledger.md` and `WATCHES.md` from
-   `templates/WATCHES.md` only if they do not already exist; never
-   overwrite an existing ledger or watch list. Delete the sample rows
-   from fresh copies.
-4. The config, ledger, and watch list hold personal data. They are
-   covered by this repo's `.gitignore`; keep them out of any commit or
+   `templates/promo-code-ledger.md` and `WISHLIST.md` from
+   `templates/WISHLIST.md` only if they do not already exist; never
+   overwrite an existing ledger or wishlist. Delete the sample rows from
+   fresh copies.
+4. The config, ledger, and wishlist hold personal data. They are covered
+   by this repo's `.gitignore`; keep them out of any commit or
    publication. Never log credentials, payment details, gift-card
    numbers, identity documents, or account session links anywhere.
 5. Read [LIMITATIONS.md](LIMITATIONS.md) and summarize the limits that
@@ -34,7 +57,9 @@ anything else. A copied example file does not count as intake.
 
 Re-run intake only when the user asks to change preferences.
 
-## Step 1: Lock the spec
+## Hunt mode
+
+### Step 1: Lock the spec
 
 Every hunt starts from an exact item: model, variant, size, color,
 condition. If the user sends a photo or a link, identify the exact model
@@ -45,7 +70,7 @@ questions; otherwise proceed. Collect per-hunt constraints at the same
 time: deadline, delivery vs local pickup, and any premium the user will
 pay to buy from a preferred retailer.
 
-## Step 2: Baseline the price
+### Step 2: Baseline the price
 
 Check live product pages at retailers appropriate to the user's region and
 preferences (config: `retailers`, `marketplaces`). Record the current
@@ -55,7 +80,7 @@ with its evidence type: **live page**, **live cart**, **tracker
 estimate**, **user-reported**, or **inaccessible** (see LIMITATIONS.md).
 Only live page and live cart prices count as verified.
 
-## Step 3: The promo hunt (required before any checkout)
+### Step 3: The promo hunt (required before any checkout)
 
 In order:
 
@@ -65,6 +90,9 @@ In order:
 3. Discount programs the user qualifies for (config:
    `discount_programs`): military, veteran, first responder, teacher,
    student, healthcare, employer programs, ID.me and similar verifiers.
+   If a program could change which deal wins and you do not know whether
+   the user qualifies, ask once, mid-hunt, rather than front-loading it
+   into intake.
 4. Forums, Reddit, Facebook groups and pages, creator codes.
 5. Deal communities. Spam aggregators last, treated as unverified leads.
 
@@ -73,7 +101,7 @@ Newsletter signup codes: only if the user opted in during intake
 inbox, create and monitor one; never use the user's personal email for a
 signup they did not approve.
 
-## Step 4: Test in the cart
+### Step 4: Test in the cart
 
 Add the exact item to the cart and test candidate codes there (cap about
 12, stop if the site throttles). Record the cart total before and after
@@ -88,7 +116,7 @@ cart, report the price as checked and the discount as untested, and hand
 the code test to the user. Respect `buying_rules.prepare_cart_for_review`:
 when it is off, test in a throwaway cart and leave nothing prepared.
 
-## Step 5: Alternate routes
+### Step 5: Alternate routes
 
 - Price matching (config: `buying_rules.pursue_price_match`): if a
   retailer the user likes price-matches a lower verified price elsewhere,
@@ -111,18 +139,36 @@ when it is off, test in a throwaway cart and leave nothing prepared.
 - Open-box and outlet stock at the same retailers, only when the user's
   condition settings allow it (config: `condition.open_box_ok`).
 
-## Step 6: Present, never purchase silently
+### Step 6: Present the deal
 
 Present the best verified deal as a consistent comparison: item price,
 discounts, shipping, taxes and fees (or "unknown", labeled as such),
 seller, stock, and delivery estimate, plus return or warranty limits when
 they differ. Call it the lowest verified total among the sources checked,
-and name the sources that could not be checked. The agent never completes
-a purchase without the user's explicit confirmation (config:
-`buying_rules`). Preparing a cart for review is fine when the config
-allows it.
+and name the sources that could not be checked.
 
-## Step 7: Log everything
+### Step 7: The handoff (buy, watch, or pass)
+
+Every hunt ends here. Present the three exits plainly and let the user
+pick; do not pick for them.
+
+- **Buy.** Prepare the cart for review (when the config allows) and wait
+  for explicit confirmation. The agent never completes a purchase without
+  it. On purchase, mark the wishlist entry `bought` (adding one first if
+  the hunt never created one) and log the purchase (Step 8).
+- **Watch.** Offer a watch with its terms already filled in from this
+  hunt, so the user confirms or changes one number instead of answering
+  questions: the exact variant from Step 1, the reference price from
+  Step 2 (amount, retailer, evidence label, date), a proposed target
+  (the config default, or a number the user names), the retailers and
+  marketplaces that actually stock it, the watch cadence and alert
+  destination from config. Create or update the wishlist entry with
+  status `watching` and set up the scheduled check (Watch mode, below).
+- **Pass.** Log what the hunt learned (Step 8) and, if the item was on
+  the wishlist, mark it `dropped`. A pass with no watch is a complete
+  outcome, not a failure.
+
+### Step 8: Log everything
 
 Append every tested code and its result to `promo-code-ledger.md`, with
 the source, the timestamp with timezone, and the before and after totals.
@@ -131,44 +177,63 @@ same file: date, item, price paid, retailer, and warranty terms where
 relevant. The ledger is a record of what worked once, not a guarantee:
 retest a code before relying on it again.
 
-## Wishlist watches
+## Watch mode
 
-Items the user wants but does not need now go in `WATCHES.md`, each with
-its own target:
+### Creating a watch
+
+From a hunt, use Step 7: everything carries over, nothing is re-derived.
+Directly ("just watch this"), lock the spec (Step 1) and take one light
+baseline (a single live price read for the reference price), then confirm
+the target, cadence, and alert destination the same way. Either way, the
+wishlist entry holds: variant, status `watching`, reference price with
+source and date, target, where to check, schedule reference, last
+checked, and last alert.
+
+Target types:
 
 - `price_ceiling`: a maximum total (product price plus shipping where
   known; say so in the entry).
-- `percent_off`: a percentage below the reference price recorded when
-  the watch was created (amount, source, currency, and date go in the
-  entry).
+- `percent_off`: a percentage below the reference price.
 - `availability`: for unreleased products, verified purchasable stock of
   the requested variant in the user's region. An announcement is
   reported as an announcement, not as availability.
 - `any_sale`: any verified price below the reference price.
 
-A cadence in the config does not schedule anything by itself. During
-intake, set up a real scheduled task in whatever scheduler your
-environment provides, verify it is enabled, and record its identifier,
-timezone, and delivery destination in the watch entry. If your
-environment cannot run unattended, mark the watch manual: checks happen
-when the user invokes them, and the user is told that plainly.
+### Running a watch
 
-Check on the cadence and stay silent until a target is hit. When a watch
-fires, record the alert (date, price, retailer) in the entry and do not
-alert again for the same price; alert again only on a new lower price or
-a return to stock after selling out. States: watching, alerted, paused,
-fulfilled. Rules that matter:
+A cadence in the config does not schedule anything by itself. Set up a
+real scheduled task in whatever scheduler your environment provides,
+verify it is enabled, and record its identifier, timezone, and delivery
+destination in the wishlist entry. If your environment cannot run
+unattended, the watch is manual: checks happen when the user invokes
+them, and the user is told that plainly at creation.
+
+Each check reads live prices for the exact variant at the entry's
+sources, updates `last checked`, and stays silent unless the target is
+hit. Rules that matter:
 
 - A preorder, backorder, or presale listing is not availability. For
-  unreleased products, fire only on a verified in-stock product page or an
-  official availability announcement.
+  unreleased products, fire only on a verified in-stock product page or
+  an official availability announcement.
 - Category-page labels ("new arrival", "limited stock") are not stock
   evidence. The product page is.
 - On marketplace listings, report the condition the listing claims and
   flag when the photos disagree with the description. The user makes the
   final condition call.
-- When a watch fires, name the item, variant, price, retailer, and link.
-  Then go quiet again.
+- Never contact sellers, never add to cart, never purchase from inside a
+  watch check.
+
+### When a watch fires
+
+Do not alert on the raw tripping price alone. Run a quick version of the
+hunt (Steps 2 to 5, lighter promo pass) so the alert carries the current
+best verified total, then present the same three exits as Step 7: buy,
+keep watching (with a new reference price if the user wants the bar
+moved), or drop. Record the alert in the entry (date, price, retailer)
+and set the status to `alerted`; do not alert again for the same price,
+only on a new lower price or a return to stock after selling out. If the
+user buys, the entry goes to `bought` and the scheduled check for it is
+removed; if they drop it, `dropped` and the check is removed.
 
 ## Guardrails
 

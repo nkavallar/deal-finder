@@ -46,16 +46,28 @@ That is the whole install. The agent will:
    deal wins).
 6. **Present the best verified total.** The agent never purchases without
    the user's explicit confirmation.
-7. **Log everything** in the ledger, so each hunt starts from evidence.
+7. **End at a decision point.** Buy it (cart prepared for approval),
+   watch it, or pass. Watching is offered with its terms already filled
+   in from the hunt: exact variant, today's price as the reference, a
+   proposed target, and the places that stock it. You confirm or change
+   one number.
+8. **Log everything** in the ledger, so each hunt starts from evidence.
 
-## Wishlist watches
+## The wishlist and watches
 
-Each watched item carries its own target: a price ceiling, a percentage
-off, or availability for unreleased products. The watch checks on a
-cadence and stays silent until the target is hit. A preorder or backorder
-is not a release, a category-page label is not stock evidence, and
-marketplace listings get their claimed condition reported with photo
-mismatches flagged.
+Hunts and watches share one personal list, the wishlist, where every
+item has a status: hunting, watching, alerted, bought, or dropped. A
+watch is a property of a wishlist item, not a separate system. It carries
+its own target (a price ceiling, a percentage off the reference price, or
+availability for unreleased products), checks on a real scheduled task,
+and stays silent until the target is hit. When it fires, the agent runs a
+quick hunt first, so the alert carries the current best total and the
+same buy, keep watching, or drop choice, not just a raw price. A preorder
+or backorder is not a release, a category-page label is not stock
+evidence, and marketplace listings get their claimed condition reported
+with photo mismatches flagged. The wishlist is your data: it is created
+locally by your agent and covered by the repo's .gitignore, never
+published.
 
 ## Files
 
@@ -64,7 +76,7 @@ mismatches flagged.
 - `LIMITATIONS.md`: what does not work and the fallbacks, stated up front.
 - `deal-finder.config.example.yaml`: the config the agent builds from
   intake.
-- `templates/`: the promo-code ledger and watch list the agent maintains.
+- `templates/`: the promo-code ledger and wishlist the agent maintains.
 
 ## Example runs (real, anonymized)
 
